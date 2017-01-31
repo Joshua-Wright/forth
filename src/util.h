@@ -18,8 +18,8 @@ typedef struct _word_t {
 typedef struct _custom_word_t {
     word_t word;
     // null-terminated array of words that make up the function
-    word_t *code[];
-};
+    word_t *code[256];
+} custom_word_t;
 
 /**
  * stack grows down, and this points to bottom of the stack.
@@ -46,6 +46,8 @@ extern word_t *top_word;
 void call();
 
 word_t *lookup_word(char *name);
+
+extern word_t word_literal;
 
 #define DECLARE_WORD(name, identifier, prev_identifier) \
     void interp_##identifier(); \

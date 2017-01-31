@@ -52,4 +52,10 @@ DECLARE_WORD(".", print_signed_int, &word_sub) {
     stack++;
 }
 
-word_t *top_word = &word_print_signed_int;
+DECLARE_WORD("lit", literal, &word_print_signed_int) {
+    stack--;
+    prog_counter++;
+    stack[0] = (stack_t) prog_counter[0];
+}
+
+word_t *top_word = &word_literal;
