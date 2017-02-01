@@ -9,11 +9,13 @@
 #define RETURN_STACK_SIZE 256
 
 typedef void(*interpreter_t)();
+typedef void(*compile_time_hook_t)();
 typedef int64_t stack_t;
 typedef struct _word_t {
     struct _word_t *prev;
     char *name;
     interpreter_t interpreter;
+    compile_time_hook_t compile_time_hook;
 } word_t;
 typedef struct _custom_word_t {
     word_t word;
@@ -48,7 +50,9 @@ void default_interpreter();
 
 extern word_t word_literal;
 
+void init_stdlib();
+
 #define DECLARE_WORD(name, identifier, prev_identifier) \
     void interp_##identifier(); \
-    word_t word_##identifier = {prev_identifier, name, interp_##identifier}; \
+    word_t word_##identifier = {prev_identifier, name, interp_##identifier, NULL}; \
     void interp_##identifier()

@@ -49,6 +49,7 @@ void function_tests() {
 }
 
 int main() {
+    init_stdlib();
     lrun("add", add);
     lrun("custom_func", add_custom_func);
     lrun("functions", function_tests);
