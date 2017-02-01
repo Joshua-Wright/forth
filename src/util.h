@@ -33,15 +33,12 @@ extern stack_t *stack;
  * same stack semantics as above
  */
 extern word_t ***return_stack;
-/**
- * inc/dec is handled by next() and call()
- */
 extern word_t **prog_counter;
 
 extern word_t *top_word;
 
 /**
- * function call. handles incrementing the program counter
+ * function call
  */
 void call();
 
