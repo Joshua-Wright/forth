@@ -8,16 +8,16 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-reorder")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Os")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 
 set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 
-set(SOURCE_FILES src/util.h src/util.c src/eval_from_file.c src/eval_from_file.h)
+set(SOURCE_FILES src/util.h src/util.c src/eval.c src/eval.h)
 
 add_executable(forth ${SOURCE_FILES} src/main.c)
 

@@ -4,4 +4,6 @@
 #include <stdio.h>
 #include "util.h"
 
-void eval_from_file(FILE* fp);
+void eval_file(FILE *fp);
+
+void eval_str(char* str);

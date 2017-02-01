@@ -47,6 +47,8 @@ void call();
 
 word_t *lookup_word(char *name);
 
+void default_interpreter();
+
 extern word_t word_literal;
 
 #define DECLARE_WORD(name, identifier, prev_identifier) \

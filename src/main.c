@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "eval_from_file.h"
+#include "eval.h"
 
 int main() {
-    eval_from_file(stdin);
+    eval_file(stdin);
     return 0;
 }
