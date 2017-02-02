@@ -6,4 +6,8 @@
 
 void eval_file(FILE *fp);
 
-void eval_str(char* str);
+/**
+ * @param str code to evaluate
+ * @return top of stack, for convenience
+ */
+stack_t eval_str(const char *str);

@@ -24,6 +24,8 @@
  *
  */
 
+/*slightly modified by https://github.com/joshua-wright */
+
 
 
 /*
@@ -56,6 +58,8 @@
  */
 
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedMacroInspection"
 #ifndef __MINCTEST_H__
 #define __MINCTEST_H__
 
@@ -113,7 +117,7 @@ static int lfails = 0;
     ++ltests;\
     if ((a) != (b)) {\
         ++lfails;\
-        printf("%s:%d (%d != %d)\n", __FILE__, __LINE__, (a), (b));\
+        printf("%s:%d (%lld != %lld)\n", __FILE__, __LINE__, ((long long)a), ((long long)b));\
     }} while (0)
 
 
@@ -128,3 +132,4 @@ static int lfails = 0;
 
 
 #endif /*__MINCTEST_H__*/
+#pragma clang diagnostic pop

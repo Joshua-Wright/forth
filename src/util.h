@@ -8,14 +8,16 @@
 #define STACK_SIZE 5120
 #define RETURN_STACK_SIZE 256
 
+typedef struct _word_t word_t;
+typedef struct _custom_word_t custom_word_t;
 typedef void(*interpreter_t)();
-typedef void(*compile_time_hook_t)();
+typedef void(*compile_time_hook_t)(custom_word_t *custom_word, size_t *word_index);
 typedef int64_t stack_t;
 typedef struct _word_t {
     struct _word_t *prev;
     char *name;
     interpreter_t interpreter;
-    compile_time_hook_t compile_time_hook;
+    compile_time_hook_t post_compile_hook;
 } word_t;
 typedef struct _custom_word_t {
     word_t word;

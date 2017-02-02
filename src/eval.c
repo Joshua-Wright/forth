@@ -1,6 +1,6 @@
 // (c) Copyright 2016 Josh Wright
 
-#include <string.h>;
+#include <string.h>
 #include "eval.h"
 
 void read_function(FILE *fp);
@@ -24,9 +24,10 @@ void eval_file(FILE *fp) {
     }
 }
 
-void eval_str(char *str) {
-    FILE *fp = fmemopen(str, strlen(str), "r");
+stack_t eval_str(const char *str) {
+    FILE *fp = fmemopen((void *) str, strlen(str), "r");
     eval_file(fp);
+    return stack[0];
 }
 
 void read_function(FILE *fp) {
@@ -36,7 +37,7 @@ void read_function(FILE *fp) {
     // initialize first parts of the data
     /* size_t alloc_size = sizeof(word_t) + sizeof(word_t*)*256; */
     size_t alloc_size = sizeof(custom_word_t);
-    custom_word_t *word_func = (custom_word_t*) malloc(alloc_size);
+    custom_word_t *word_func = (custom_word_t *) malloc(alloc_size);
     memset(word_func, 0, alloc_size);
     word_func->word.interpreter = default_interpreter;
     word_func->word.prev = top_word;
@@ -45,7 +46,7 @@ void read_function(FILE *fp) {
 
     // read function name
     fscanf(fp, "%255s", namebuf);
-    word_func->word.name = malloc(strlen(namebuf)+1);
+    word_func->word.name = malloc(strlen(namebuf) + 1);
     strcpy(word_func->word.name, namebuf);
 
     // read in all the word of the function contents
@@ -55,11 +56,15 @@ void read_function(FILE *fp) {
         if (word == NULL) { // numeric literal
             word_func->code[word_idx] = &word_literal;
             word_idx++;
-            word_func->code[word_idx] = (word_t*) atol(namebuf);
+            word_func->code[word_idx] = (word_t *) atol(namebuf);
             word_idx++;
+
         } else { // function that we already have
             word_func->code[word_idx] = word;
             word_idx++;
+            if (word->post_compile_hook != NULL) {// compile-time special word
+                word->post_compile_hook(word_func, &word_idx);
+            }
         }
         fscanf(fp, "%255s", namebuf);
     }
