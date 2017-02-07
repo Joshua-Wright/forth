@@ -3,6 +3,7 @@
 #include "minctest.h"
 #include "../src/util.h"
 #include "../src/eval.h"
+#include "../src/debug_helpers.h"
 
 void add() {
     stack -= 2;
@@ -23,23 +24,25 @@ void add() {
 }
 
 void add_custom_func() {
+    eval_str(": add4 + + + ;");
     stack -= 4;
     stack[0] = 4;
     stack[1] = 3;
     stack[2] = 7;
     stack[3] = 9;
-    eval_str(": add4 + + + ;");
     lequal(eval_str("add4"), 4 + 3 + 7 + 9);
 }
 
 void test_if() {
-    lequal(eval_str("5 0 >"), 1);
-    lequal(eval_str("0 5 <"), 1);
+    lequal(eval_str("0 5 >"), 1);
+    lequal(eval_str("5 0 <"), 1);
 
-    eval_str(": gt5 5 > if 1 else 0 then ; ");
+    // test if-else-then
+    eval_str(": gt5 5 <= if 1 else 99 then ; ");
     lequal(eval_str("7 gt5 "), 1);
-    lequal(eval_str("2 gt5 "), 0);
+    lequal(eval_str("2 gt5 "), 99);
 
+    // test if-else<nested>-then
     eval_str(": sgn "
                      " dup 0> if 1 else "
                      " dup 0< if -1 else "
@@ -49,6 +52,18 @@ void test_if() {
     lequal(eval_str("3 sgn"), 1);
     lequal(eval_str("-3 sgn"), -1);
     lequal(eval_str("0 sgn"), 0);
+
+    // test if-else-then-<other stuff>
+    eval_str(": t1 0 if 2 else 3 then drop 5 ; ");
+    lequal(eval_str("t1"), 5);
+
+    // test if and then after each other
+    eval_str(": t2 dup 0> if 1 * else 2 * then dup 0> if 1000 + else 2000 + then ; ");
+    lequal(eval_str("0 t2"), 2000+0);
+    lequal(eval_str("2 t2"), 1000+2);
+    lequal(eval_str("7 t2"), 1000+7);
+    lequal(eval_str("-2 t2"), 2000-2*2);
+    lequal(eval_str("-7 t2"), 2000-7*2);
 }
 
 void function_tests() {
@@ -56,12 +71,13 @@ void function_tests() {
     // arithmetic
     lequal(eval_str("3 4 +"), 3 + 4);
     lequal(eval_str("321 4523 -"), 4523 - 321);
-    lequal(eval_str("321 4523 - 8 3 * /"), (4523 - 321) / (8 * 3));
+    lequal(eval_str("8 3 * 321 4523 - /"), (4523 - 321) / (8 * 3));
 
     // stack manipulation
     lequal(eval_str("3 dup *"), 3 * 3);
     lequal(eval_str("3 dup dup * +"), 3 * 3 + 3);
-    lequal(eval_str("3 987 swap /"), 987 / 3);
+    lequal(eval_str("3 987 /"), 987 / 3);
+    lequal(eval_str("3 987 swap /"), 3/ 987);
     lequal(eval_str("3 987 drop"), 3);
 }
 

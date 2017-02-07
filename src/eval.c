@@ -27,7 +27,7 @@ void eval_file(FILE *fp) {
 stack_t eval_str(const char *str) {
     FILE *fp = fmemopen((void *) str, strlen(str), "r");
     eval_file(fp);
-    return stack[0];
+    return POP(stack);
 }
 
 void read_function(FILE *fp) {
