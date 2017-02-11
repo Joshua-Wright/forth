@@ -18,11 +18,11 @@ char *safe_word_name(word_t *word) {
 void pretty_print_custom_word(custom_word_t *custom_word) {
     printf("%p: %s\n", custom_word, custom_word->word.name);
 
-    // TODO fix this when custom words have variable-sized lengths
-    for (int i = 0; i < 32; ++i) {
+    for (int i = 0; i < custom_word->code_size; ++i) {
         char *word_name = safe_word_name(custom_word->code[i]);
         if (word_name != NULL) {
-            printf("%6i %6x: %12p %12lli %s\n", i, i, custom_word->code[i], (long long int) custom_word->code[i], safe_word_name(custom_word->code[i]));
+            printf("%6i %6x: %12p %12lli %s\n", i, i, custom_word->code[i], (long long int) custom_word->code[i],
+                   safe_word_name(custom_word->code[i]));
         } else {
             printf("%6i %6x: %12p %12lli\n", i, i, custom_word->code[i], (long long int) custom_word->code[i]);
         }
@@ -39,6 +39,7 @@ void pretty_print_custom_word_by_name(char *name) {
         }
         cur = cur->prev;
     }
+    printf("word not found: %s\n", name);
 }
 
 

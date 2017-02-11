@@ -15,11 +15,8 @@ void add() {
     word_t *code[] = {add, add, NULL};
     prog_counter = code;
     // run to the end of the current block
-    do {
-        call();
-    } while (prog_counter[0] != NULL);
+    forth_main_loop();
     prog_counter = 0;
-
     lequal(stack[0], 1 + 2 + 8123);
 }
 
@@ -66,6 +63,17 @@ void test_if() {
     lequal(eval_str("-7 t2"), 2000-7*2);
 }
 
+void fib() {
+    eval_str(": fib dup 1 = if 1 else dup 2 = if 1 else dec dup dec fib swap fib + then then ; ");
+    /* pretty_print_custom_word_by_name("fib"); */
+    lequal(eval_str("1 fib"), 1);
+    lequal(eval_str("2 fib"), 1);
+    lequal(eval_str("3 fib"), 2);
+    lequal(eval_str("4 fib"), 3);
+    lequal(eval_str("5 fib"), 5);
+    lequal(eval_str("7 fib"), 13);
+}
+
 void function_tests() {
 
     // arithmetic
@@ -87,6 +95,7 @@ int main() {
     lrun("custom_func", add_custom_func);
     lrun("functions", function_tests);
     lrun("if", test_if);
+//     lrun("fib", fib);
     lresults();
     return 0;
 }

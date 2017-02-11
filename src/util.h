@@ -25,9 +25,9 @@ typedef struct _word_t {
 } word_t;
 typedef struct _custom_word_t {
     word_t word;
-    // array of words that make up the function
-    // TODO make this variable size
-    word_t *code[256];
+    // pointer to array of words that make up the function
+    size_t code_size;
+    word_t **code;
 } custom_word_t;
 
 typedef enum {
@@ -51,29 +51,27 @@ typedef struct {
  * *stack=thing;
  */
 extern stack_t *stack;
-/**
- * same stack semantics as above
- */
 extern word_t ***return_stack;
 extern word_t **prog_counter;
 // tip of word linked-list
 extern word_t *top_word;
 extern control_stack_t *control_stack;
 
-/**
- * function call
- */
-void call();
-
 word_t *lookup_word(char *name);
 
 void default_interpreter();
+
+void forth_main_loop();
 
 extern word_t word_literal;
 
 void init_stdlib();
 
-#define DECLARE_WORD(name, identifier, prev_identifier) \
-    void interp_##identifier(); \
-    word_t word_##identifier = {prev_identifier, name, interp_##identifier, NULL}; \
-    void interp_##identifier()
+#define WORD_INTERP(__identifier) void interp_##__identifier()
+#define WORD_COMPILE(__identifier) void compile_##__identifier(custom_word_t *custom_word, size_t *word_index)
+#define WORD_STRUCT(__name, __identifier, __prev_identifier) \
+    word_t word_##__identifier = {&word_##__prev_identifier, __name, interp_##__identifier, compile_##__identifier};
+#define WORD_INTERP_ONLY(__name, __identifier, __prev_word) \
+    WORD_INTERP(__identifier); \
+    word_t word_##__identifier = {__prev_word, __name, interp_##__identifier, NULL}; \
+    WORD_INTERP(__identifier)
