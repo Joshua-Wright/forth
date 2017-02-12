@@ -130,13 +130,13 @@ WORD_INTERP_ONLY("dup", dup, &word_drop) {
     stack[0] = stack[1];
 }
 
-WORD_INTERP_ONLY("dup2", dup2, &word_dup) {
+WORD_INTERP_ONLY("2dup", 2dup, &word_dup) {
     stack -= 2;
     stack[0] = stack[2];
     stack[1] = stack[3];
 }
 
-WORD_INTERP_ONLY("swap", swap, &word_dup2) {
+WORD_INTERP_ONLY("swap", swap, &word_2dup) {
     stack_t n1 = POP(stack);
     stack_t n2 = POP(stack);
     PUSH(stack, n1);
@@ -244,4 +244,70 @@ WORD_INTERP(then) {}
 WORD_STRUCT("then", then, else);
 
 
-word_t *top_word = &word_then;
+WORD_COMPILE(do) {
+    // todo
+    ssize_t *addr_of_this = (ssize_t *) &custom_word->code[*word_index];
+
+    control_stack--;
+    control_stack->resolve_offset_dest = addr_of_this;
+    control_stack->control_type = CONTROL_DO;
+}
+
+WORD_INTERP(do) {
+    // todo
+    // keep looping info on the return stack
+    return_stack -= 2;
+    // index
+    return_stack[0] = (word_t **) POP(stack);
+    // limit
+    return_stack[1] = (word_t **) POP(stack);
+}
+
+WORD_STRUCT("do", do, then);
+
+
+WORD_COMPILE(loop) {
+    // todo assert top of control stack is do
+    // keep the address of the do block to return to
+    ssize_t *addr_of_do = control_stack->resolve_offset_dest;
+    control_stack++;
+    ssize_t *addr_of_this = (ssize_t *) &custom_word->code[*word_index];
+    // set our offset
+    custom_word->code[*word_index] = (word_t *) (addr_of_do - addr_of_this - 1);
+    // advance word counter to after our offset
+    (*word_index)++;
+}
+
+WORD_INTERP(loop) {
+    // fetch index and limit
+    uint64_t index = (uint64_t) return_stack[0];
+    uint64_t limit = (uint64_t) return_stack[1];
+
+    // we can't increment the index in-place because that would be using pointer math
+    // so we increment it and then put it back
+    index++;
+    return_stack[0]= (word_t **) index;
+
+    // increment so we're looking at our branch target address
+    prog_counter++;
+    if (index < limit) {
+        // retrun to loop start
+        prog_counter += (int64_t) prog_counter[0];
+    } else {
+        // pop loop info and keep going
+        return_stack += 2;
+    }
+}
+
+WORD_STRUCT("loop", loop, do)
+
+WORD_INTERP_ONLY("i", get_loop_counter, &word_loop) {
+    PUSH(stack, return_stack[0]);
+}
+
+WORD_INTERP_ONLY("j", get_loop_counter2, &word_get_loop_counter) {
+    PUSH(stack, return_stack[2]);
+}
+
+
+word_t *top_word = &word_get_loop_counter2;

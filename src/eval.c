@@ -26,8 +26,14 @@ void eval_file(FILE *fp) {
 
 stack_t eval_str(const char *str) {
     FILE *fp = fmemopen((void *) str, strlen(str), "r");
+    stack_t *stack_before = stack;
     eval_file(fp);
-    return POP(stack);
+    // only pop the value from the stack if there is actually a value on the stack to pop
+    if (stack < stack_before) {
+        return POP(stack);
+    } else {
+        return 0;
+    }
 }
 
 void read_function(FILE *fp) {

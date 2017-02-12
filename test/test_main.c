@@ -6,13 +6,13 @@
 #include "../src/debug_helpers.h"
 
 void add() {
-    stack -= 2;
+    stack -= 3;
     stack[0] = 1;
     stack[1] = 2;
     stack[2] = 8123;
 
-    word_t *add = lookup_word("+");
-    word_t *code[] = {add, add, NULL};
+    word_t *add_word = lookup_word("+");
+    word_t *code[] = {add_word, add_word, NULL};
     prog_counter = code;
     // run to the end of the current block
     forth_main_loop();
@@ -22,12 +22,7 @@ void add() {
 
 void add_custom_func() {
     eval_str(": add4 + + + ;");
-    stack -= 4;
-    stack[0] = 4;
-    stack[1] = 3;
-    stack[2] = 7;
-    stack[3] = 9;
-    lequal(eval_str("add4"), 4 + 3 + 7 + 9);
+    lequal(eval_str("4 3 7 9 add4"), 4 + 3 + 7 + 9);
 }
 
 void test_if() {
@@ -56,22 +51,11 @@ void test_if() {
 
     // test if and then after each other
     eval_str(": t2 dup 0> if 1 * else 2 * then dup 0> if 1000 + else 2000 + then ; ");
-    lequal(eval_str("0 t2"), 2000+0);
-    lequal(eval_str("2 t2"), 1000+2);
-    lequal(eval_str("7 t2"), 1000+7);
-    lequal(eval_str("-2 t2"), 2000-2*2);
-    lequal(eval_str("-7 t2"), 2000-7*2);
-}
-
-void fib() {
-    eval_str(": fib dup 1 = if 1 else dup 2 = if 1 else dec dup dec fib swap fib + then then ; ");
-    /* pretty_print_custom_word_by_name("fib"); */
-    lequal(eval_str("1 fib"), 1);
-    lequal(eval_str("2 fib"), 1);
-    lequal(eval_str("3 fib"), 2);
-    lequal(eval_str("4 fib"), 3);
-    lequal(eval_str("5 fib"), 5);
-    lequal(eval_str("7 fib"), 13);
+    lequal(eval_str("0 t2"), 2000 + 0);
+    lequal(eval_str("2 t2"), 1000 + 2);
+    lequal(eval_str("7 t2"), 1000 + 7);
+    lequal(eval_str("-2 t2"), 2000 - 2 * 2);
+    lequal(eval_str("-7 t2"), 2000 - 7 * 2);
 }
 
 void function_tests() {
@@ -85,8 +69,35 @@ void function_tests() {
     lequal(eval_str("3 dup *"), 3 * 3);
     lequal(eval_str("3 dup dup * +"), 3 * 3 + 3);
     lequal(eval_str("3 987 /"), 987 / 3);
-    lequal(eval_str("3 987 swap /"), 3/ 987);
+    lequal(eval_str("3 987 swap /"), 3 / 987);
     lequal(eval_str("3 987 drop"), 3);
+}
+
+void fib() {
+    // TODO this doesn't work
+    eval_str(": fib dup 1 = if 1 else dup 2 = if 1 else dec dup dec fib swap fib + then then ; ");
+    /* pretty_print_custom_word_by_name("fib"); */
+    lequal(eval_str("1 fib"), 1);
+    lequal(eval_str("2 fib"), 1);
+    lequal(eval_str("3 fib"), 2);
+    lequal(eval_str("4 fib"), 3);
+    lequal(eval_str("5 fib"), 5);
+    lequal(eval_str("7 fib"), 13);
+}
+
+void test_do_loop() {
+    eval_str(": sum1toN 0 swap 0 do i + loop ; ");
+    lequal(eval_str("10 sum1toN"), 10*9/2);
+    lequal(eval_str("999 sum1toN"), 999*998/2);
+
+    eval_str(": nestedLoop "
+                     "0 0"
+                     "10 0 do "
+                     "10 0 do "
+                     "i j + + "
+                     "loop loop "
+                     "; ");
+    lequal(eval_str("nestedLoop"), 900);
 }
 
 int main() {
@@ -95,7 +106,8 @@ int main() {
     lrun("custom_func", add_custom_func);
     lrun("functions", function_tests);
     lrun("if", test_if);
-//     lrun("fib", fib);
+    lrun("do loop", test_do_loop);
+//    lrun("fib", fib);
     lresults();
     return 0;
 }
