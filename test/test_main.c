@@ -26,11 +26,11 @@ void add_custom_func() {
 }
 
 void test_if() {
-    lequal(eval_str("0 5 >"), 1);
-    lequal(eval_str("5 0 <"), 1);
+    lequal(eval_str("0 5 >"), 0);
+    lequal(eval_str("5 0 <"), 0);
 
     // test if-else-then
-    eval_str(": gt5 5 <= if 1 else 99 then ; ");
+    eval_str(": gt5 5 >= if 1 else 99 then ; ");
     lequal(eval_str("7 gt5 "), 1);
     lequal(eval_str("2 gt5 "), 99);
 
@@ -62,33 +62,47 @@ void function_tests() {
 
     // arithmetic
     lequal(eval_str("3 4 +"), 3 + 4);
-    lequal(eval_str("321 4523 -"), 4523 - 321);
-    lequal(eval_str("8 3 * 321 4523 - /"), (4523 - 321) / (8 * 3));
+    lequal(eval_str("321 4523 -"), 321 - 4523);
+    lequal(eval_str("321 4523 - 8 3 * /"), (321 - 4523) / (8 * 3));
 
     // stack manipulation
     lequal(eval_str("3 dup *"), 3 * 3);
     lequal(eval_str("3 dup dup * +"), 3 * 3 + 3);
-    lequal(eval_str("3 987 /"), 987 / 3);
-    lequal(eval_str("3 987 swap /"), 3 / 987);
+    lequal(eval_str("987 3 /"), 987 / 3);
+    lequal(eval_str("3 987 swap /"), 987 / 3);
+    lequal(eval_str("3 987 /"), 0);
     lequal(eval_str("3 987 drop"), 3);
+
+    lequal(eval_str("55 1-"), 54);
+}
+
+void test_exit() {
+    eval_str(": testExit 3 exit 4 ; ");
+    lequal(eval_str("3 testExit"), 3);
 }
 
 void fib() {
-    // TODO this doesn't work
-    eval_str(": fib dup 1 = if 1 else dup 2 = if 1 else dec dup dec fib swap fib + then then ; ");
-    /* pretty_print_custom_word_by_name("fib"); */
+    eval_str(": factorial "
+                     " dup 2 < if drop 1 exit then "
+                     " dup 1- recurse * "
+                     ";");
+    lequal(eval_str("1 factorial"), 1);
+    lequal(eval_str("2 factorial"), 2);
+    lequal(eval_str("10 factorial"), 3628800);
+
+    eval_str(": fib "
+                     " dup 2 <= if drop 1 exit else "
+                     " 1- dup 1- recurse swap recurse + "
+                     " then ; ");
     lequal(eval_str("1 fib"), 1);
     lequal(eval_str("2 fib"), 1);
-    lequal(eval_str("3 fib"), 2);
-    lequal(eval_str("4 fib"), 3);
-    lequal(eval_str("5 fib"), 5);
     lequal(eval_str("7 fib"), 13);
 }
 
 void test_do_loop() {
     eval_str(": sum1toN 0 swap 0 do i + loop ; ");
-    lequal(eval_str("10 sum1toN"), 10*9/2);
-    lequal(eval_str("999 sum1toN"), 999*998/2);
+    lequal(eval_str("10 sum1toN"), 10 * 9 / 2);
+    lequal(eval_str("999 sum1toN"), 999 * 998 / 2);
 
     eval_str(": nestedLoop "
                      "0 0"
@@ -107,7 +121,8 @@ int main() {
     lrun("functions", function_tests);
     lrun("if", test_if);
     lrun("do loop", test_do_loop);
-//    lrun("fib", fib);
+    lrun("exit", test_exit);
+    lrun("fib", fib);
     lresults();
     return 0;
 }

@@ -60,7 +60,6 @@ void read_function(FILE *fp) {
 
     // read in all the word of the function contents
     fscanf(fp, "%255s", namebuf);
-//    while (!(namebuf[0] == ';' && namebuf[1] == '\0')) {
     while (true) {
         word_t *word = lookup_word(namebuf);
         if (word == NULL) { // numeric literal
@@ -70,10 +69,10 @@ void read_function(FILE *fp) {
             word_idx++;
         } else { // function that we already have
             word_func->code[word_idx] = word;
-            word_idx++;
             if (word->post_compile_hook != NULL) {// compile-time special word
                 word->post_compile_hook(word_func, &word_idx);
             }
+            word_idx++;
         }
         // break if the function is over
         if (namebuf[0] == ';' && namebuf[1] == '\0') {

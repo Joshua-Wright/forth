@@ -71,7 +71,15 @@ void init_stdlib();
 #define WORD_COMPILE(__identifier) void compile_##__identifier(custom_word_t *custom_word, size_t *word_index)
 #define WORD_STRUCT(__name, __identifier, __prev_identifier) \
     word_t word_##__identifier = {&word_##__prev_identifier, __name, interp_##__identifier, compile_##__identifier};
-#define WORD_INTERP_ONLY(__name, __identifier, __prev_word) \
+#define WORD_INTERP_ONLY(__name, __identifier, __prev_identifier) \
     WORD_INTERP(__identifier); \
-    word_t word_##__identifier = {__prev_word, __name, interp_##__identifier, NULL}; \
+    word_t word_##__identifier = {&word_##__prev_identifier, __name, interp_##__identifier, NULL}; \
     WORD_INTERP(__identifier)
+//#define WORD_INTERP_ONLY(__name, __identifier, __prev_word) \
+//    WORD_INTERP(__identifier); \
+//    word_t word_##__identifier = {__prev_word, __name, interp_##__identifier, NULL}; \
+//    WORD_INTERP(__identifier)
+#define WORD_COMPILE_ONLY(__name, __identifier, __prev_word) \
+    WORD_COMPILE(__identifier); \
+    word_t word_##__identifier = {&word_##__prev_word, __name, NULL, compile_##__identifier }; \
+    WORD_COMPILE(__identifier)
